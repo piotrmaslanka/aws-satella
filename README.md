@@ -36,8 +36,13 @@ This will initialize such thread, if one does not exist already.
 
 # Change log
 
+## v1.2
+
+* _TBA_
+
 ## v1.1
 
 * fixed maximum number of metrics uploaded
 * metrics with dimension count above 10 will be discarded
     with a warning
+
