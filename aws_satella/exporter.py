@@ -1,5 +1,6 @@
 import logging
 import typing as tp
+from threading import Lock
 import boto3
 from boto3.exceptions import Boto3Error
 from satella.coding import log_exceptions
@@ -64,3 +65,17 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
     def send_metrics(self, data):
         self.cloudwatch.put_metric_data(MetricData=data,
                                         Namespace=self.namespace)
+
+
+worker_thread = None
+
+worker_thread_lock = Lock()
+
+
+def start_if_not_started(*args, **kwargs):
+    global worker_thread, worker_thread_lock
+    with worker_thread_lock:
+        if worker_thread is None:
+            worker_thread = AWSSatellaExporterThread(*args, **kwargs)
+            worker_thread.start()
+

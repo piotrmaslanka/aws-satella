@@ -18,3 +18,12 @@ aws.start()
 
 This spawns a daemonic thread. For details,
 refer to the [docs](aws_satella/exporter.py).
+
+You can additionally use
+```python
+from aws_satella import start_if_not_started
+
+start_if_not_started(*args, **kwargs)
+```
+Both `args` and `kwargs` will be passed to constructor.
+This will initialize such thread, if one does not exist already.
