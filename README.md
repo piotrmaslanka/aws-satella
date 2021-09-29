@@ -1,4 +1,10 @@
 # aws-satella
+[![PyPI](https://img.shields.io/pypi/pyversions/aws-satella.svg)](https://pypi.python.org/pypi/aws-satella)
+[![PyPI version](https://badge.fury.io/py/aws-satella.svg)](https://badge.fury.io/py/aws-satella)
+[![PyPI](https://img.shields.io/pypi/implementation/aws-satella.svg)](https://pypi.python.org/pypi/aws-satella)
+[![Documentation Status](https://readthedocs.org/projects/aws-satella/badge/?version=latest)](http://aws-satella.readthedocs.io/en/latest/?badge=latest)
+[![License](https://img.shields.io/pypi/l/aws-satella)](https://github.com/Dronehub/aws-satella)
+
 A library to export Satella's metrics to AWS CloudWatch
 
 # Installation

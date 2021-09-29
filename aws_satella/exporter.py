@@ -60,11 +60,13 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
         if results:
             self.send_metrics(results)
 
-    @log_exceptions(logger, logging.INFO, 'Failure uploading metrics: {e}',
-                    exc_types=Boto3Error)
+    @log_exceptions(logger, logging.WARNING, 'Failure uploading metrics: {e}',
+                    exc_types=Boto3Error, swallow_exception=True)
     def send_metrics(self, data):
         self.cloudwatch.put_metric_data(MetricData=data,
                                         Namespace=self.namespace)
+        logger.debug('Successfully published %s metrics to namespace %s',
+                     len(data), self.namespace)
 
 
 worker_thread = None
