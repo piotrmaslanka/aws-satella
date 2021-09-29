@@ -35,6 +35,10 @@ This will initialize such thread, if one does not exist already.
 
 # Change log
 
+## v1.3
+
+* _TBA_
+
 ## v1.2
 
 * critical bugfix
