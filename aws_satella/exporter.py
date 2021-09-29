@@ -5,26 +5,40 @@ from boto3.exceptions import Boto3Error
 from satella.coding import log_exceptions
 from satella.coding.concurrent import IntervalTerminableThread
 from satella.instrumentation.metrics import getMetric
-
+from satella.time import parse_time_string
 
 logger = logging.getLogger(__name__)
 
 
 class AWSSatellaExporterThread(IntervalTerminableThread):
     """
-    A AWS satella exporter thread
+    A AWS satella exporter thread. Is daemonic.
 
-    :param interval: amount of seconds to wait between sending metrics
+    Can be also used like:
+
+    >>> import boto3
+    >>> boto_client = boto3.client('cloudwatch')
+    >>> aws_e = AWSSatellaExporterThread('AppNamespace', boto_client)
+    >>> aws_e.start()
+    >>> ...
+    >>> aws_e.terminate().join()
+
     :param namespace: AWS namespace to use
-    :param extra_dimensions: extra dimensions to add to send metrics
-    :param max_send_at_once: maximum amount of metrics to send for a single call to AWS
+    :param extra_dimensions: extra dimensions to add to sent metrics
+    :param boto3_client: a boto3 client to use. If not given, a default one
+        with a resource name of 'cloudwatch' will be created.
+    :param interval: amount of seconds to wait between sending metrics. Defaults to 60.
+        Can be also given in a form of expression, like '30m'
+    :param max_send_at_once: maximum amount of metrics to send for a single call to AWS.
+        Defaults to 1000.
     """
-    def __init__(self, interval: int, namespace: str,
+    def __init__(self, namespace: str,
                  extra_dimensions: tp.Optional[tp.Dict[str, str]] = None,
+                 boto3_client=None, interval: tp.Union[str, int] = '60s',
                  max_send_at_once: int = 1000):
-        super().__init__(interval, name='aws-satella-metrics', daemon=True)
+        super().__init__(parse_time_string(interval), name='aws-satella-metrics', daemon=True)
         self.MAX_SEND_AT_ONCE = max_send_at_once
-        self.cloudwatch = boto3.client('cloudwatch')
+        self.cloudwatch = boto3_client or boto3.client('cloudwatch')
         self.extra_dimensions = extra_dimensions or {}
         self.namespace = namespace
 

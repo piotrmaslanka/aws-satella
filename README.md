@@ -12,7 +12,7 @@ pip install aws-satella
 ```python
 from aws_satella import AWSSatellaExporterThread
 
-aws = AWSSatellaExporterThread(60, 'AppNamespace')
+aws = AWSSatellaExporterThread('AppNamespace')
 aws.start()
 ```
 
