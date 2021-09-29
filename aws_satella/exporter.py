@@ -61,7 +61,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
                             'Unit': 'None',
                             'Value': val.value})
 
-            if len(results) >= self.MAX_SUBMIT_ONCE:
+            if len(results) >= self.MAX_SEND_AT_ONCE:
                 self.send_metrics(results)
                 results = []
         if results:

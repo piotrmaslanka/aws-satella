@@ -37,7 +37,7 @@ This will initialize such thread, if one does not exist already.
 
 ## v1.2
 
-* _TBA_
+* critical bugfix
 
 ## v1.1
 
