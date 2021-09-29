@@ -1,10 +1,12 @@
 import logging
 import typing as tp
+import warnings
 from threading import Lock
 import boto3
 from boto3.exceptions import Boto3Error
 from satella.coding import log_exceptions
 from satella.coding.concurrent import IntervalTerminableThread
+from satella.coding.transforms import stringify
 from satella.instrumentation.metrics import getMetric
 from satella.time import parse_time_string
 
@@ -49,12 +51,17 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
         for val in md.values:
             dims = val.labels
             dims.update(self.extra_dimensions)
+            dims = stringify(dims)
+            if len(dims) > 10:
+                warnings.warn('Maximum number of dimensions for AWS is 10, skipping this metric',
+                              RuntimeWarning)
+                continue
             results.append({'MetricName': val.name,
                             'Dimensions': dims,
                             'Unit': 'None',
                             'Value': val.value})
 
-            if len(results) > self.MAX_SUBMIT_ONCE:
+            if len(results) >= self.MAX_SUBMIT_ONCE:
                 self.send_metrics(results)
                 results = []
         if results:
