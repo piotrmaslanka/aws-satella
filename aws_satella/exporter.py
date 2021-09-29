@@ -31,12 +31,12 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
     :param interval: amount of seconds to wait between sending metrics. Defaults to 60.
         Can be also given in a form of expression, like '30m'
     :param max_send_at_once: maximum amount of metrics to send for a single call to AWS.
-        Defaults to 1000.
+        Defaults to 20.
     """
     def __init__(self, namespace: str,
                  extra_dimensions: tp.Optional[tp.Dict[str, str]] = None,
                  boto3_client=None, interval: tp.Union[str, int] = '60s',
-                 max_send_at_once: int = 1000):
+                 max_send_at_once: int = 20):
         super().__init__(parse_time_string(interval), name='aws-satella-metrics', daemon=True)
         self.MAX_SEND_AT_ONCE = max_send_at_once
         self.cloudwatch = boto3_client or boto3.client('cloudwatch')
