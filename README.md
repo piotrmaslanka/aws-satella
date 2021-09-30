@@ -35,7 +35,7 @@ This will initialize such thread, if one does not exist already.
 
 # Change log
 
-## v1.4
+## v1.4 (to be released)
 
 * added handler for metric fail uploads
 
