@@ -34,7 +34,7 @@ except InitializationError:
 ```
 
 This spawns a daemonic thread. For details,
-refer to the [docs](aws_satella/exporter.py).
+refer to the [docs](https://aws-satella.readthedocs.io).
 
 You can additionally use
 ```python
@@ -46,6 +46,10 @@ Both `args` and `kwargs` will be passed to constructor.
 This will initialize such thread, if one does not exist already.
 
 # Change log
+
+## v2.1 (next release)
+
+* _TBA_
 
 ## v2.0
 
