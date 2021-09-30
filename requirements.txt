@@ -1,0 +1,3 @@
+satella
+botocore
+boto3
