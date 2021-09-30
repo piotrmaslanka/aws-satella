@@ -9,6 +9,26 @@ from satella.instrumentation.metrics import getMetric
 from aws_satella import AWSSatellaExporterThread, start_if_not_started
 
 
+class PutMetricData:
+    def __init__(self, raise_exc=False):
+        self.called = False
+        self.raise_exc = raise_exc
+
+    def __call__(self, MetricData=None, Namespace=None):
+        if self.raise_exc:
+            raise Boto3Error()
+        assert isinstance(MetricData, list)
+        assert Namespace == 'Celery'
+        for md in MetricData:
+            assert isinstance(md['Value'], (int, float))
+            assert 'MetricName' in md
+            for elem in md['Dimensions']:
+                assert 'Name' in elem and 'Value' in elem
+                assert isinstance(elem['Name'], str)
+                assert isinstance(elem['Value'], str)
+        self.called = True
+
+
 class TestExporter(unittest.TestCase):
     @mock.patch('boto3.client')
     def test_autostart(self, client):
@@ -18,7 +38,7 @@ class TestExporter(unittest.TestCase):
 
     @mock.patch('boto3.client')
     def test_exporter(self, client):
-        client2 = mock.MagicMock()
+        client2 = PutMetricData()
         metric = getMetric('metric', 'counter')
         metric2 = getMetric('metric', 'counter')
         metric.runtime(+1)
@@ -40,10 +60,7 @@ class TestExporter(unittest.TestCase):
         metric2 = getMetric('metric', 'counter')
         metric.runtime(+1)
         metric2.runtime(+1, tag='value')
-
-        def put_metric_data(**data):
-            raise Boto3Error()
-
+        put_metric_data = PutMetricData(True)
         do = DictObject(put_metric_data=put_metric_data)
         start_if_not_started('Celery', interval=1)
         failload = mock.MagicMock()
@@ -56,7 +73,7 @@ class TestExporter(unittest.TestCase):
 
     @mock.patch('boto3.client')
     def test_exporter_too_many_labels(self, client):
-        client2 = mock.MagicMock()
+        client2 = PutMetricData()
         d = {}
         for i in range(11):
             d[str(i)] = str(i)
@@ -74,7 +91,7 @@ class TestExporter(unittest.TestCase):
 
     @mock.patch('boto3.client')
     def test_exporter_many_metrics(self, client):
-        client2 = mock.MagicMock()
+        client2 = PutMetricData()
         for i in range(21):
             getMetric('i%s' % (i, ), 'counter').runtime(1)
         do = DictObject(put_metric_data=client2)
