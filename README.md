@@ -37,7 +37,7 @@ This will initialize such thread, if one does not exist already.
 
 ## v1.3
 
-* _TBA_
+* fixed exception handling
 
 ## v1.2
 

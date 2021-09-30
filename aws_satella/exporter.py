@@ -4,6 +4,7 @@ import warnings
 from threading import Lock
 import boto3
 from boto3.exceptions import Boto3Error
+from botocore.exceptions import BotoCoreError
 from satella.coding import log_exceptions
 from satella.coding.concurrent import IntervalTerminableThread
 from satella.coding.transforms import stringify
@@ -68,7 +69,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
             self.send_metrics(results)
 
     @log_exceptions(logger, logging.WARNING, 'Failure uploading metrics: {e}',
-                    exc_types=Boto3Error, swallow_exception=True)
+                    exc_types=(BotoCoreError, Boto3Error), swallow_exception=True)
     def send_metrics(self, data):
         self.cloudwatch.put_metric_data(MetricData=data,
                                         Namespace=self.namespace)
