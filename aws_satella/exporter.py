@@ -8,7 +8,7 @@ from botocore.exceptions import BotoCoreError
 from satella.coding import reraise_as
 from satella.coding.concurrent import IntervalTerminableThread
 from satella.coding.transforms import stringify
-from satella.instrumentation.metrics import getMetric
+from satella.instrumentation.metrics import getMetric, MetricData
 from satella.time import parse_time_string
 
 logger = logging.getLogger(__name__)
@@ -30,12 +30,15 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
         Defaults to 20.
     :param call_on_metric_upload_fails: optional callable, to be called with an Exception
         instance when upload of the metrics fails
+    :param call_on_discarded_metric: called with a discarded MetricData. Metrics will be discarded
+        for having more than 10 dimensions (after update)
     """
     def __init__(self, namespace: str,
                  extra_dimensions: tp.Optional[tp.Dict[str, str]] = None,
                  interval: tp.Union[str, int] = '60s',
                  max_send_at_once: int = 20,
-                 call_on_metric_upload_fails: tp.Callable[[Exception], None] = lambda e: None):
+                 call_on_metric_upload_fails: tp.Callable[[Exception], None] = lambda e: None,
+                 call_on_discarded_metric: tp.Callable[[MetricData], None] = lambda e: None):
         super().__init__(parse_time_string(interval), name='aws-satella-metrics', daemon=True)
         self.MAX_SEND_AT_ONCE = max_send_at_once
         with reraise_as((Boto3Error, BotoCoreError), InitializationError):
@@ -43,6 +46,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
         self.call_on_metric_upload_fails = call_on_metric_upload_fails
         self.extra_dimensions = extra_dimensions or {}
         self.namespace = namespace
+        self.call_on_discarded_metric = call_on_discarded_metric
 
     def loop(self) -> None:
         md = getMetric().to_metric_data()
@@ -54,12 +58,13 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
             if len(dims) > 10:
                 warnings.warn('Maximum number of dimensions for AWS is 10, skipping this metric',
                               RuntimeWarning)
+                self.call_on_discarded_metric(val)
+                continue
 
             dimensions = []
             for key, value in dims.items():
                 dimensions.append({'Name': key, 'Value': str(value)})
 
-                continue
             results.append({'MetricName': val.name,
                             'Dimensions': dimensions,
                             'Unit': 'None',

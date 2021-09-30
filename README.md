@@ -48,6 +48,7 @@ This will initialize such thread, if one does not exist already.
 
 ## v2.0 (first working release)
 
+* added a callable for discarded metrics
 * dimensions will be checked for before the dict-convert
 
 ## v1.5 (to be released)

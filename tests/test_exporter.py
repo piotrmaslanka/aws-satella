@@ -37,23 +37,6 @@ class TestExporter(unittest.TestCase):
         worker_thread.terminate().join()
 
     @mock.patch('boto3.client')
-    def test_exporter(self, client):
-        client2 = PutMetricData()
-        metric = getMetric('metric', 'counter')
-        metric2 = getMetric('metric', 'counter')
-        metric.runtime(+1)
-        metric2.runtime(+1, tag='value')
-        do = DictObject(put_metric_data=client2)
-        start_if_not_started('Celery', interval=1)
-        aws = AWSSatellaExporterThread('Celery', interval=1)
-        aws.cloudwatch = do
-        aws.start()
-        time.sleep(2)
-        client.assert_called_once_with('cloudwatch')
-        self.assertTrue(client2.called)
-        aws.terminate().join()
-
-    @mock.patch('boto3.client')
     def test_exporter_raising(self, client):
         client2 = mock.MagicMock()
         metric = getMetric('metric', 'counter')
@@ -74,6 +57,7 @@ class TestExporter(unittest.TestCase):
     @mock.patch('boto3.client')
     def test_exporter_too_many_labels(self, client):
         client2 = PutMetricData()
+        call_on_discard = mock.MagicMock()
         d = {}
         for i in range(11):
             d[str(i)] = str(i)
@@ -81,12 +65,14 @@ class TestExporter(unittest.TestCase):
         metric.runtime(+1, **d)
         do = DictObject(put_metric_data=client2)
         start_if_not_started('Celery', interval=1)
-        aws = AWSSatellaExporterThread('Celery', interval=1)
+        aws = AWSSatellaExporterThread('Celery', interval=1,
+                                       call_on_discarded_metric=call_on_discard)
         aws.cloudwatch = do
         aws.start()
         time.sleep(2)
         client.assert_called_once_with('cloudwatch')
         self.assertTrue(client2.called)
+        self.assertTrue(call_on_discard.called)
         aws.terminate().join()
 
     @mock.patch('boto3.client')
