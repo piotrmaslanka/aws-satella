@@ -55,3 +55,8 @@ This will initialize such thread, if one does not exist already.
 
 * first real release
 
+# Special thanks
+
+My special thanks go out to the team at 
+[Mailerrize](https://mailerrize.com)
+for their support.
