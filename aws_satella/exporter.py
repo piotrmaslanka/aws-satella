@@ -48,7 +48,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
         md = getMetric().to_metric_data()
         results = []
         for val in md.values:
-            dims = val.labels
+            dims = dict(val.labels)
             dims.update(self.extra_dimensions)
             dims = stringify(dims)
             if len(dims) > 10:

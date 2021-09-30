@@ -47,6 +47,7 @@ This will initialize such thread, if one does not exist already.
 * added handler for metric fail uploads
 * removed the boto_client parameter
 * added InitializationError
+* fixed a critical bug
 
 ## v1.3
 
