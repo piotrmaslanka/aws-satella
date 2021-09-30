@@ -35,13 +35,17 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
         Can be also given in a form of expression, like '30m'
     :param max_send_at_once: maximum amount of metrics to send for a single call to AWS.
         Defaults to 20.
+    :param call_on_metric_upload_fails: optional callable, to be called with an Exception
+        instance when upload of the metrics fails
     """
     def __init__(self, namespace: str,
                  extra_dimensions: tp.Optional[tp.Dict[str, str]] = None,
                  boto3_client=None, interval: tp.Union[str, int] = '60s',
-                 max_send_at_once: int = 20):
+                 max_send_at_once: int = 20,
+                 call_on_metric_upload_fails: tp.Callable[[Exception], None] = lambda e: None):
         super().__init__(parse_time_string(interval), name='aws-satella-metrics', daemon=True)
         self.MAX_SEND_AT_ONCE = max_send_at_once
+        self.call_on_metric_upload_fails = call_on_metric_upload_fails
         self.cloudwatch = boto3_client or boto3.client('cloudwatch')
         self.extra_dimensions = extra_dimensions or {}
         self.namespace = namespace
@@ -68,13 +72,15 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
         if results:
             self.send_metrics(results)
 
-    @log_exceptions(logger, logging.WARNING, 'Failure uploading metrics: {e}',
-                    exc_types=(BotoCoreError, Boto3Error), swallow_exception=True)
     def send_metrics(self, data):
-        self.cloudwatch.put_metric_data(MetricData=data,
-                                        Namespace=self.namespace)
-        logger.debug('Successfully published %s metrics to namespace %s',
-                     len(data), self.namespace)
+        try:
+            self.cloudwatch.put_metric_data(MetricData=data,
+                                            Namespace=self.namespace)
+            logger.debug('Successfully published %s metrics to namespace %s',
+                         len(data), self.namespace)
+        except (BotoCoreError, Boto3Error) as e:
+            self.call_on_metric_upload_fails(e)
+            logger.warning('Failure uploading metrics', exc_info=e)
 
 
 worker_thread = None
