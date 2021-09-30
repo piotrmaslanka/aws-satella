@@ -4,7 +4,7 @@ import warnings
 from threading import Lock
 import boto3
 from boto3.exceptions import Boto3Error
-from botocore.exceptions import BotoCoreError
+from botocore.exceptions import BotoCoreError, ClientError
 from satella.coding import reraise_as
 from satella.coding.concurrent import IntervalTerminableThread
 from satella.coding.transforms import stringify
@@ -41,7 +41,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
                  call_on_discarded_metric: tp.Callable[[MetricData], None] = lambda e: None):
         super().__init__(parse_time_string(interval), name='aws-satella-metrics', daemon=True)
         self.MAX_SEND_AT_ONCE = max_send_at_once
-        with reraise_as((Boto3Error, BotoCoreError), InitializationError):
+        with reraise_as((Boto3Error, BotoCoreError, ClientError), InitializationError):
             self.cloudwatch = boto3.client('cloudwatch')
         self.call_on_metric_upload_fails = call_on_metric_upload_fails
         self.extra_dimensions = extra_dimensions or {}
@@ -82,7 +82,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
                                             Namespace=self.namespace)
             logger.debug('Successfully published %s metrics to namespace %s',
                          len(data), self.namespace)
-        except (BotoCoreError, Boto3Error) as e:
+        except (BotoCoreError, Boto3Error, ClientError) as e:
             self.call_on_metric_upload_fails(e)
             logger.warning('Failure uploading metrics', exc_info=e)
 
