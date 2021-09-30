@@ -51,13 +51,14 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
             dims = dict(val.labels)
             dims.update(self.extra_dimensions)
 
-            dimensions = []
-            for key, value in dims:
-                dimensions.append({'Name': key, 'Value': str(value)})
-
-            if len(dimensions) > 10:
+            if len(dims) > 10:
                 warnings.warn('Maximum number of dimensions for AWS is 10, skipping this metric',
                               RuntimeWarning)
+
+            dimensions = []
+            for key, value in dims.items():
+                dimensions.append({'Name': key, 'Value': str(value)})
+
                 continue
             results.append({'MetricName': val.name,
                             'Dimensions': dimensions,

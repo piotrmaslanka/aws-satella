@@ -46,6 +46,10 @@ This will initialize such thread, if one does not exist already.
 
 # Change log
 
+## v2.0 (first working release)
+
+* dimensions will be checked for before the dict-convert
+
 ## v1.5 (to be released)
 
 * added Travis and CodeClimate
