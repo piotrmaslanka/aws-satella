@@ -15,10 +15,17 @@ pip install aws-satella
 # Usage
 
 ```python
-from aws_satella import AWSSatellaExporterThread
+import sys
+from aws_satella import AWSSatellaExporterThread, InitializationError
 
-aws = AWSSatellaExporterThread('AppNamespace')
-aws.start()
+
+try:
+    aws = AWSSatellaExporterThread('AppNamespace')
+    aws.start()
+except InitializationError:
+    print('Could not initialize the boto3 client')
+    sys.exit(1)
+
 ```
 
 This spawns a daemonic thread. For details,
@@ -38,6 +45,8 @@ This will initialize such thread, if one does not exist already.
 ## v1.4 (to be released)
 
 * added handler for metric fail uploads
+* removed the boto_client parameter
+* added InitializationError
 
 ## v1.3
 
