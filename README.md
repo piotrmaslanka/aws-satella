@@ -47,33 +47,7 @@ This will initialize such thread, if one does not exist already.
 
 # Change log
 
-## v2.0 (first working release)
+## v2.0
 
-* added a callable for discarded metrics
-* dimensions will be checked for before the dict-convert
-
-## v1.5 (to be released)
-
-* added Travis and CodeClimate
-
-## v1.4
-
-* added handler for metric fail uploads
-* removed the boto_client parameter
-* added InitializationError
-* fixed a critical bug
-
-## v1.3
-
-* fixed exception handling
-
-## v1.2
-
-* critical bugfix
-
-## v1.1
-
-* fixed maximum number of metrics uploaded
-* metrics with dimension count above 10 will be discarded
-    with a warning
+* first real release
 
