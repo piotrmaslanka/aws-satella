@@ -7,6 +7,7 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d460105ad44269de543b/test_coverage)](https://codeclimate.com/github/piotrmaslanka/aws-satella/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/d460105ad44269de543b/maintainability)](https://codeclimate.com/github/piotrmaslanka/aws-satella/maintainability)
 [![Issue Count](https://codeclimate.com/github/piotrmaslanka/aws-satella/badges/issue_count.svg)](https://codeclimate.com/github/piotrmaslanka/aws-satella)
+[![Documentation Status](https://readthedocs.org/projects/aws-satella/badge/?version=latest)](http://aws-satella.readthedocs.io/en/latest/?badge=latest)
 
 A library to export Satella's metrics to AWS CloudWatch
 
