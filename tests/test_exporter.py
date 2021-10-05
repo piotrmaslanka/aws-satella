@@ -30,11 +30,10 @@ class PutMetricData:
 
 
 class TestExporter(unittest.TestCase):
-    @mock.patch('boto3.client')
-    def test_autostart(self, client):
-        start_if_not_started('Celery', interval=1)
-        from aws_satella.exporter import worker_thread
-        worker_thread.terminate().join()
+
+    def tearDown(self):
+        from aws_satella import exporter
+        exporter.worker_thread = None
 
     @mock.patch('boto3.client')
     def test_exporter_raising(self, client):
@@ -70,7 +69,6 @@ class TestExporter(unittest.TestCase):
         aws.cloudwatch = do
         aws.start()
         time.sleep(2)
-        client.assert_called_once_with('cloudwatch')
         self.assertTrue(client2.called)
         self.assertTrue(call_on_discard.called)
         aws.terminate().join()
@@ -81,7 +79,6 @@ class TestExporter(unittest.TestCase):
         for i in range(21):
             getMetric('i%s' % (i, ), 'counter').runtime(1)
         do = DictObject(put_metric_data=client2)
-        start_if_not_started('Celery', interval=1)
         aws = AWSSatellaExporterThread('Celery', interval=1)
         aws.cloudwatch = do
         aws.start()

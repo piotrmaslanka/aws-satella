@@ -22,3 +22,5 @@ This will provide all of it's arguments to:
 Which in turn may raise an exception during it's construction, namely:
 
 .. autoclass:: aws_satella.InitializationError
+
+If you service preforks, set :code:`add_pid` argument to, for example :code:`pid`.

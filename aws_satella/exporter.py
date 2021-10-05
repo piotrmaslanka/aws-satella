@@ -1,7 +1,9 @@
 import logging
+import os
 import typing as tp
 import warnings
 from threading import Lock
+
 import boto3
 from boto3.exceptions import Boto3Error
 from botocore.exceptions import BotoCoreError, ClientError
@@ -25,6 +27,8 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
     :param extra_dimensions: extra dimensions to add to sent metrics
     :param interval: amount of seconds to wait between sending metrics. Defaults to 60.
         Can be also given in a form of expression, like '30m'
+    :param add_pid: If this is set to a string this will add an extra dimension called that
+        and having the value of this process' PID. This is done to monitor preforking services.
     :param max_send_at_once: maximum amount of metrics to send for a single call to AWS.
         Defaults to 20.
     :param call_on_metric_upload_fails: optional callable, to be called with an Exception
@@ -32,10 +36,12 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
     :param call_on_discarded_metric: called with a discarded MetricData. Metrics will be discarded
         for having more than 10 dimensions (after update)
     """
+
     def __init__(self, namespace: str,
                  extra_dimensions: tp.Optional[tp.Dict[str, str]] = None,
                  interval: tp.Union[str, int] = '60s',
                  max_send_at_once: int = 20,
+                 add_pid: tp.Optional[str] = None,
                  call_on_metric_upload_fails: tp.Callable[[Exception], None] = lambda e: None,
                  call_on_discarded_metric: tp.Callable[[MetricData], None] = lambda e: None):
         super().__init__(parse_time_string(interval), name='aws-satella-metrics', daemon=True)
@@ -45,6 +51,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
         self.call_on_metric_upload_fails = call_on_metric_upload_fails
         self.extra_dimensions = extra_dimensions or {}
         self.namespace = namespace
+        self.add_pid = add_pid
         self.call_on_discarded_metric = call_on_discarded_metric
 
     def loop(self) -> None:
@@ -59,6 +66,9 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
                               RuntimeWarning)
                 self.call_on_discarded_metric(val)
                 continue
+
+            if self.add_pid:
+                dims[self.add_pid] = os.getpid()
 
             dimensions = []
             for key, value in dims.items():

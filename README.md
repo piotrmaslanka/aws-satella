@@ -49,7 +49,7 @@ This will initialize such thread, if one does not exist already.
 
 ## v2.1 (next release)
 
-* _TBA_
+* added `add_pid` parameter
 
 ## v2.0
 
