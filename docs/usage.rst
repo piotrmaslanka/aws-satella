@@ -45,3 +45,7 @@ To use aws-satella with Django, add the following to your :code:`settings.py:
     }
 
 Basically all the parameters here will be passed as kwargs to AWSSatellaExporterThread.
+
+Note that you still need to install and configure django-satella-metrics separately_.
+
+.. _separately: https://github.com/piotrmaslanka/django-satella-metrics
