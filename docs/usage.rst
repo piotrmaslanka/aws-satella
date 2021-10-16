@@ -24,3 +24,23 @@ Which in turn may raise an exception during it's construction, namely:
 .. autoclass:: aws_satella.InitializationError
 
 If you service preforks, set :code:`add_pid` argument to, for example :code:`pid`.
+
+Usage with Django
+==================
+
+To use aws-satella with Django, add the following to your :code:`MIDDLEWARES`:
+
+.. code-block:: python
+
+    'aws_satella.contrib.django.AWSSatellaMiddleware
+
+And add the following to your :code:`settings.py`:
+
+.. code-block:: python
+
+    AWS_SATELLA_MIDDLEWARE_CONSTRUCTOR = {
+        'namespace': 'YourAppNamespace',
+        'add_pid': 'pid
+    }
+
+Basically all the parameters here will be passed as kwargs to AWSSatellaExporterThread.

@@ -45,15 +45,12 @@ start_if_not_started(*args, **kwargs)
 Both `args` and `kwargs` will be passed to constructor.
 This will initialize such thread, if one does not exist already.
 
+This also supports easy Django configuration, for details go
+[read the docs](https://aws-satella.readthedocs.org).
+
 # Change log
 
-## v2.1 (next release)
-
-* added `add_pid` parameter
-
-## v2.0
-
-* first real release
+Change log was moved [here](https://aws-satella.readthedocs.io/en/latest/changelog.html).
 
 # Special thanks
 
