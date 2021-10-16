@@ -28,19 +28,20 @@ If you service preforks, set :code:`add_pid` argument to, for example :code:`pid
 Usage with Django
 ==================
 
-To use aws-satella with Django, add the following to your :code:`MIDDLEWARES`:
+To use aws-satella with Django, add the following to your :code:`settings.py:
+
 
 .. code-block:: python
 
-    'aws_satella.contrib.django.AWSSatellaMiddleware
-
-And add the following to your :code:`settings.py`:
-
-.. code-block:: python
+    MIDDLEWARE = [
+        ...,
+        'aws_satella.contrib.django.AWSSatellaMiddleware',
+        ...
+    ]
 
     AWS_SATELLA_MIDDLEWARE_CONSTRUCTOR = {
         'namespace': 'YourAppNamespace',
-        'add_pid': 'pid
+        'add_pid': 'pid'
     }
 
 Basically all the parameters here will be passed as kwargs to AWSSatellaExporterThread.
