@@ -1,6 +1,10 @@
 Change log
 ==========
 
+v2.4
+~~~~
+
+* default interval set to 5 minutes
 
 v2.3
 ~~~~

@@ -25,7 +25,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
 
     :param namespace: AWS namespace to use
     :param extra_dimensions: extra dimensions to add to sent metrics
-    :param interval: amount of seconds to wait between sending metrics. Defaults to 60.
+    :param interval: amount of seconds to wait between sending metrics. Defaults to 5 minutes.
         Can be also given in a form of expression, like '30m'
     :param add_pid: If this is set to a string this will add an extra dimension called that
         and having the value of this process' PID. This is done to monitor preforking services.
@@ -39,7 +39,7 @@ class AWSSatellaExporterThread(IntervalTerminableThread):
 
     def __init__(self, namespace: str,
                  extra_dimensions: tp.Optional[tp.Dict[str, str]] = None,
-                 interval: tp.Union[str, int] = '60s',
+                 interval: tp.Union[str, int] = '300s',
                  max_send_at_once: int = 20,
                  add_pid: tp.Optional[str] = None,
                  call_on_metric_upload_fails: tp.Callable[[Exception], None] = lambda e: None,
